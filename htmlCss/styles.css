@@ -1,0 +1,51 @@
+/** @format */
+
+@font-face {
+	font-family: Roboto-Black;
+	src: url('./fonts/Roboto-Black.ttf') format('truetype'), ;
+}
+
+@font-face {
+	font-family: Roboto-BlackItalic;
+	src: url('./fonts/Roboto-BlackItalic.ttf') format('truetype'), ;
+}
+
+p.text {
+	color: red;
+	font-family: 'Roboto-Black';
+	font-variant: small-caps;
+}
+
+p.text::first-letter {
+	font-size: 250%;
+}
+
+p.text::before {
+	content: '';
+	border: 1px solid black;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+td, th {
+	border: 1px solid black;
+}
+
+.checkboxA:checked {
+	border: 1px solid green
+}
+.checkboxA:focus {
+	border: 1px solid green
+}
+
+.btn-cancel {
+	border-color: pink;
+}
+
+.dropdown-selection {
+	border: 1px solid #7A5CFA;
+	background-color: #fff;
+	color: gray;
+}
