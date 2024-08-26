@@ -90,3 +90,21 @@ const key = obj['1'];
  * 		return [3, 5] // in any order
  * }
  */
+
+function findSmallestNumber(arr) {
+  if (!arr || arr.length === 0) return;
+
+  let smallest = arr[0];
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] < smallest) {
+      smallest = arr[i];
+    }
+  }
+  return smallest;
+}
+
+console.log('Find smallest number');
+console.log(findSmallestNumber(arr));
+console.log(findSmallestNumber([3]));
+console.log(findSmallestNumber([]));
+console.log(findSmallestNumber());
