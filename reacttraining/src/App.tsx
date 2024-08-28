@@ -1,25 +1,22 @@
-import React from 'react';
-import logo from './logo.svg';
+/** @format */
+
+import React, { useState } from 'react';
 import './App.css';
+import { ListPosts, Example, Login } from './pages';
 
 function App() {
+  const [forceRerender, updateForceRedender] = useState(0);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Login />
+      {forceRerender < 1 ? (
+        <Example name={{ value: 'Example', id: 1 }} />
+      ) : null}
+      <button onClick={() => updateForceRedender(forceRerender + 1)}>
+        Force Rerender {forceRerender}
+      </button>
+      <ListPosts />
+    </>
   );
 }
 
