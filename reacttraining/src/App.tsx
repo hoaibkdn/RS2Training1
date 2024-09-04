@@ -1,23 +1,34 @@
 /** @format */
 
 import React, { useState } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './App.css';
-import { ListPosts, Example, Login } from './pages';
+import { ListPosts, Example, Login, PostDetail, Root } from './pages';
+import { ListPostContext } from './context/ListPostContext';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Root />,
+    children: [
+      {
+        path: '',
+        element: <ListPosts />,
+      },
+      {
+        path: 'post/:postId',
+        element: <PostDetail />,
+      },
+    ],
+  },
+  {
+    path: '/login',
+    element: <Login />,
+  },
+]);
 
 function App() {
-  const [forceRerender, updateForceRedender] = useState(0);
-  return (
-    <>
-      <Login />
-      {forceRerender < 1 ? (
-        <Example name={{ value: 'Example', id: 1 }} />
-      ) : null}
-      <button onClick={() => updateForceRedender(forceRerender + 1)}>
-        Force Rerender {forceRerender}
-      </button>
-      <ListPosts />
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

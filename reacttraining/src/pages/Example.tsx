@@ -7,6 +7,7 @@ type Props = {
 
 type State = {
   name: { value: string };
+  birthday: Date;
 };
 
 class Example extends React.Component<Props, State> {
@@ -16,6 +17,7 @@ class Example extends React.Component<Props, State> {
     super(props);
     this.state = {
       name: { value: 'Now' },
+      birthday: new Date(),
     };
     console.log('constructor');
     this.handleTimeout = setTimeout(() => {
@@ -59,9 +61,10 @@ class Example extends React.Component<Props, State> {
   }
   handleClick2() {
     console.log('this click 2 ', this);
-    this.setState({
+    this.setState((prevState) => ({
+      ...prevState,
       name: { value: 'Click 2' },
-    });
+    }));
   }
   handleClick3() {
     console.log('this click 3 ', this);

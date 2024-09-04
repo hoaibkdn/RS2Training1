@@ -1,20 +1,39 @@
 /** @format */
+import { memo, useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { ListPostContext } from '../context/ListPostContext';
 
-type Props = {
+interface PostModel {
   title: string;
   body: string;
-  count?: number;
+  id: number;
+  userId: number;
+}
+type Props = {
+  // count?: number;
+  postDetail: {
+    post: PostModel;
+    count?: number;
+  };
 };
 
-const Post = ({ title, body, count }: Props) => {
-  // console.log('post render ', title);
+const Post = ({ postDetail }: Props) => {
+  console.log('post render ', postDetail.post.id);
+  const contextData = useContext(ListPostContext);
+  console.log('contextData ', contextData);
   return (
     <div>
-      <strong>{title}</strong>
-      <p>{body}</p>
-      {count && <p>{count}</p>}
+      <Link to={'post/' + postDetail.post.id}>
+        <strong>{postDetail.post.title}</strong>
+      </Link>
+      <p>{postDetail.post.body}</p>
+      {/* {count && <p>{count}</p>} */}
     </div>
   );
 };
 
-export default Post;
+const arePropsEqual = (prevProps: Props, nextProps: Props) => {
+  return prevProps.postDetail.post.title === nextProps.postDetail.post.title;
+};
+
+export default memo(Post, arePropsEqual); // shallow compare
