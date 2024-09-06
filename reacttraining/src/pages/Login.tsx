@@ -1,15 +1,20 @@
 /** @format */
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { Input } from '../components';
 import { validateForm } from './../utils/validation';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { LOGIN } from './../store/actions';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState(''); // controlled component
   const [password, setPassword] = useState(''); // asynchronous  (batch update)
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const auth = useSelector((state: any) => state.auth);
+  console.log('auth ', auth);
   const [errorMsgs, setErrorMsg] = useState({
     username: '',
     password: '',
@@ -20,6 +25,13 @@ const Login = () => {
   }); // uncontrolled component
   // const usernameRef = useRef<HTMLInputElement>(null); // uncontrolled component
   // const passwordRef = useRef<HTMLInputElement>(null);
+
+  // useEffect(() => {
+  //   // didmount
+  //   if (auth.isLoggedIn) {
+  //     navigate('/');
+  //   }
+  // }, [auth, navigate]);
 
   const handleSubmit = useCallback((event: { preventDefault: any }) => {
     console.log('submit ', inputRefs);
@@ -35,7 +47,11 @@ const Login = () => {
 
       if (!errorMsgs.username && !errorMsgs.password) {
         // dispatch Action
-        // dispatch(login);
+        dispatch({
+          type: LOGIN,
+          username,
+          password,
+        });
       }
     }
   }, []); // [] didmount
@@ -50,6 +66,10 @@ const Login = () => {
     },
     [setPassword]
   );
+
+  if (auth.isLoggedIn) {
+    return <Navigate to='/' replace={true} />;
+  }
 
   return (
     <div className='app'>
@@ -88,7 +108,6 @@ const Login = () => {
           style={{ marginTop: '20px' }}>
           Login
         </Button>
-        {/* <button type='submit'>Login</button> */}
       </Box>
     </div>
   );

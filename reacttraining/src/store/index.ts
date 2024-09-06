@@ -1,10 +1,29 @@
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import { authReducer } from "./reducers/authReducer";
+/** @format */
+
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from 'redux-persist';
+import { authReducer } from './reducers/authReducer';
+import { postsReducer } from './reducers/postsReducer';
+import storage from 'redux-persist/lib/storage';
+import { thunk } from 'redux-thunk';
+
+const persistConfig = {
+  key: 'root',
+  storage,
+};
 
 const rootReducer = combineReducers({
-	auth: authReducer
-})
+  auth: authReducer,
+  posts: postsReducer,
+});
 
-const store = configureStore({reducer: rootReducer})
-export type DispatchState = ReturnType<typeof store.getState>
-export default store
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().prepend(thunk)
+});
+export type AppDispatch = typeof store.dispatch;
+
+export const persistor = persistStore(store);
+export default store;

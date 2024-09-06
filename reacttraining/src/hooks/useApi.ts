@@ -4,7 +4,7 @@ import { fetchData } from '../utils/fetchData';
 import { useState, useEffect } from 'react';
 
 const useApi = (url: string, initialData?: any) => {
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState(initialData); // internal state
   useEffect(() => {
     const fetchDataDetail = async () => {
       try {
@@ -21,3 +21,4 @@ const useApi = (url: string, initialData?: any) => {
 };
 
 export default useApi;
+
