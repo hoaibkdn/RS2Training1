@@ -1,9 +1,22 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { LOGIN } from './../actions'
+
+const login = createAsyncThunk('login', ({ username, password }) => {
+	// fetch /auth
+	const auth = {}
+	// compare
+	
+	// Challenge 14:
+	/**
+	 * install json server
+	 * implement login
+	 */
+})
 
 const initialState = {
   isLoggedIn: false,
-	loading: 'idle'
+	loading: 'idle',
+	error: ''
 }
 
 const authSlice = createSlice({
@@ -11,10 +24,16 @@ const authSlice = createSlice({
 	initialState,
 	reducers: {},
 	extraReducers(builder) {
-		builder.addCase(LOGIN, (state, action) => {
+		builder.addCase(login.fulfilled, (state, action) => {
 			console.log('state ', state)
 			console.log('action ', action)
 			state.isLoggedIn = true
+		})
+		builder.addCase(login.rejected, (state, action) => {
+			console.log('state ', state)
+			console.log('action ', action)
+			state.isLoggedIn = false
+			state.error = 'Username or password is not correct'
 		})
 		// builder.addCase(''posts/fetchListPosts_REQUESTED', () => {
 

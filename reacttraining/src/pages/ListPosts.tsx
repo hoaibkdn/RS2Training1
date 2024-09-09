@@ -15,6 +15,7 @@ import useApi from './../hooks/useApi';
 import { useSelector, useDispatch } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { fetchListPosts } from './../store/reducers/postsReducer';
+import { fetchListUsers } from '../store/reducers/usersReducer';
 import { AppDispatch } from './../store';
 
 const compute = () => {
@@ -34,13 +35,14 @@ function ListPosts() {
   const [time, setTime] = useState(0);
   const totalTitleLength = useRef<number>(0); // ref
   const dispatch = useDispatch<AppDispatch>();
-  const { auth, posts } = useSelector((state: any) => state);
-  const postsData = posts.list ?? [];
-  console.log('auth ', auth);
-  console.log('posts ', posts);
+  const { auth, posts, users } = useSelector((state: any) => state);
+  const postIds = posts.ids ?? [];
+  const postsData = posts.data || {};
+  const userData = users.data;
 
   useEffect(() => {
     dispatch(fetchListPosts());
+    dispatch(fetchListUsers());
   }, [dispatch]);
 
   const addPost = useCallback(() => {
@@ -55,37 +57,6 @@ function ListPosts() {
       // totalTitleLength.current += post1.title.length;
     }
   }, []);
-
-  // Challenge 11.1:
-  // fetch List post data
-  // useEffect(() => {
-  //   const fetchListPost = async () => {
-  //     try {
-  //       const listPost = await fetchData('/posts');
-  //       setPostsData(listPost);
-  //     } catch (error) {
-  //       console.error('Error fetching posts:', error);
-  //     }
-  //   };
-  //   fetchListPost();
-  // }, []);
-
-  // useEffect(() => {
-  //   console.log('useEffect ');
-  //   if (count > 3) {
-  //     addPost();
-  //   }
-  //   return () => {
-  //     console.log('will unmount ');
-  //   };
-  // }, [count, addPost]); // []: did mount
-  // [dependency]: did update
-  // will unmount
-
-  // const total = useMemo(() => compute(), []);
-
-  // [useState, useState, useRef, useCallback, useEffect, useMemo]
-  //
 
   const handleIncrease = useCallback(() => {
     // re-render 1 time: batchupdate
@@ -111,18 +82,22 @@ function ListPosts() {
       <button onClick={handleIncrease}>Increase</button>
       {/* <p style={{ color: 'green' }}>{total}</p> */}
       <button onClick={addPost}>Add post</button>
-      {postsData.map((post: PostModel) =>
-        post ? (
+      {postIds.map((id: PostModel['id']) => {
+        const post = postsData[id];
+        const postWithUser = post
+          ? { ...post, name: userData[post.userId].name }
+          : null;
+        return postWithUser ? (
           <Post
-            key={post.id} // 1, 2, 3 1,
-            postDetail={{ post, count: postsData.length }}
+            key={postWithUser.id} // 1, 2, 3 1,
+            postDetail={{ post: postWithUser, count: postsData.length }}
             // title={post.title}
             // body={post.body}
             // id={post.id}
             // count={postsData.length}
           />
-        ) : null
-      )}
+        ) : null;
+      })}
     </>
   );
 }

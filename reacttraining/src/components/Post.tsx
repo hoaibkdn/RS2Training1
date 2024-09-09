@@ -19,9 +19,9 @@ type Props = {
 };
 
 const Post = ({ postDetail }: Props) => {
-  console.log('post render ', postDetail.post.id);
+  // console.log('post render ', postDetail.post.id);
   const contextData = useContext(ListPostContext);
-  console.log('contextData ', contextData);
+  // console.log('contextData ', contextData);
   return (
     <div>
       <Link to={'post/' + postDetail.post.id}>
