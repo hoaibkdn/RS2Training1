@@ -1,5 +1,5 @@
 /** @format */
-import { memo, useContext, useState, useCallback } from 'react';
+import { memo, useContext, useState, useCallback, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { ListPostContext } from '../context/ListPostContext';
 import { FormEvent } from 'react';
@@ -30,14 +30,16 @@ const Post = ({ post }: Props) => {
   // console.log('posts state ', state);
   console.log('alo alo ', post.id);
   const dispatch = useDispatch();
-  const handleChangeInput = useCallback((event: any, field: InputField) => {
-    // TOFIX: double check event typescript
-    setChangingInput((prevState) => ({
-      ...prevState,
-      [field]: event.target.value,
-    }));
-    // submit post
-  }, []);
+  const handleChangeInput = useCallback(
+    (event: ChangeEvent<HTMLInputElement>, field: InputField) => {
+      setChangingInput((prevState) => ({
+        ...prevState,
+        [field]: event.target.value,
+      }));
+      // submit post
+    },
+    []
+  );
   const hanleSave = useCallback(() => {
     dispatch({
       type: EDIT_POST,
@@ -46,7 +48,7 @@ const Post = ({ post }: Props) => {
       userId: post.userId,
     });
     setEdingField(null);
-  }, [dispatch, changingInput, post.id, setEdingField]);
+  }, [dispatch, changingInput, post.id, setEdingField, post.userId]);
   return (
     <div>
       <Link to={'post/' + post.id}>

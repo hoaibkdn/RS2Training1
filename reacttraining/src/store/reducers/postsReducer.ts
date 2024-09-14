@@ -1,7 +1,8 @@
 /** @format */
 
-import { createAsyncThunk, createSlice, CaseReducer, Action } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, CaseReducer, PayloadAction, PayloadActionCreator } from '@reduxjs/toolkit';
 import { PostsState, PostModel, PostsDataObject } from './../../types/post';
+import { Action } from 'redux';
 import { UserModel } from './../../types/user';
 import { fetchData } from '../../utils/fetchData';
 import { EDIT_POST } from './../actions';
@@ -22,6 +23,14 @@ export const fetchListPosts = createAsyncThunk(
   }
 );
 
+type ActionType = Action<string> & {
+  postId: PostModel['id'];
+  changingInput: {
+    body: string;
+    name: string;
+  };
+};
+
 const initialState: PostsState = {
   ids: [],
   data: {},
@@ -32,12 +41,13 @@ const initialState: PostsState = {
 const postsSlice = createSlice({
   name: 'posts',
   initialState,
-  reducers: {},
+  reducers: {
+
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchListPosts.pending, (state, action) => {
       state.loading = 'loading';
-    });
-    builder.addCase(fetchListPosts.fulfilled, (state, action) => {
+    }).addCase(fetchListPosts.fulfilled, (state, action) => {
       const posts = action.payload?.posts || [];
       if (!posts.length) return;
       const postObj: PostsDataObject = {};
@@ -56,21 +66,22 @@ const postsSlice = createSlice({
       state.error = action.payload?.error as string;
       state.loading = 'succeed';
     });
-    builder.addCase(fetchListPosts.rejected, (state, action) => {
-      state.loading = 'failed';
-    });
-    builder.addCase(
-      EDIT_POST,
-      (
-        state,
-        action: any // TOFIX: double check addCase typescript
-      ) => {
-        state.data[action.postId] = {
-          ...state.data[action.postId],
-          body: action.changingInput.body,
-        };
-      }
-    );
+    builder
+      .addCase(fetchListPosts.rejected, (state, action) => {
+        state.loading = 'failed';
+      })
+      .addCase<string, ActionType>(
+        EDIT_POST,
+        (
+          state,
+          action
+        ) => {
+          state.data[action.postId] = {
+            ...state.data[action.postId],
+            body: action.changingInput.body,
+          };
+        }
+      );
   },
 });
 
