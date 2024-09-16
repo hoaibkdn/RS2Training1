@@ -1,5 +1,6 @@
 /** @format */
-import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
+// import { useFormStatus } from 'react-dom'; // TODO: Double check useFormStatus
 import { Input } from '../components';
 import { validateForm } from './../utils/validation';
 import Box from '@mui/material/Box';
@@ -7,10 +8,12 @@ import Button from '@mui/material/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { LOGIN } from './../store/actions';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { boxStyle } from './styles';
 
 const Login = () => {
   const [username, setUsername] = useState(''); // controlled component
   const [password, setPassword] = useState(''); // asynchronous  (batch update)
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const auth = useSelector((state: any) => state.auth);
@@ -57,7 +60,7 @@ const Login = () => {
   }, []); // [] didmount
 
   const handleChangeData = useCallback(
-    (value: string, type: string) => {
+    (value: string, type?: string) => {
       if (type === 'password') {
         setPassword(value);
       } else {
@@ -73,17 +76,7 @@ const Login = () => {
 
   return (
     <div className='app'>
-      <Box
-        component='form'
-        onSubmit={handleSubmit}
-        style={{
-          margin: 'auto',
-          border: '1px solid #c3c3c3',
-          borderRadius: '5px',
-          backgroundColor: 'white',
-          width: '400px',
-          padding: '20px',
-        }}>
+      <Box component='form' onSubmit={handleSubmit} style={boxStyle}>
         <Input
           label='Username'
           value={username}

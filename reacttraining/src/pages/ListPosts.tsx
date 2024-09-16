@@ -1,24 +1,24 @@
 /** @format */
 
-import React, {
+import {
   useState,
-  useMemo,
   useCallback,
   useRef,
+  lazy,
+  Suspense,
+  useMemo,
   useEffect,
-  useContext,
 } from 'react';
-import Post from '../components/Post';
-import { fetchData } from '../utils/fetchData';
+import { debounce } from 'lodash'; //
 import { PostModel } from './../types/post';
-import useApi from './../hooks/useApi';
-import { useSelector, useDispatch } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { fetchListPosts } from './../store/reducers/postsReducer';
-import { fetchListUsers } from '../store/reducers/usersReducer';
-import { AppDispatch } from './../store';
+import Input from './../components/Input';
+import { useFetchPosts } from './../hooks/useFetchPosts';
 
-const compute = () => {
+const Post = lazy(() => import('../components/Post'));
+/**
+ * How useMemo works:
+ * const compute = () => {
   let i = 0;
   let total = 0;
   while (i < 1000000000) {
@@ -27,24 +27,17 @@ const compute = () => {
   }
   return total;
 };
+ */
 
 function ListPosts() {
-  // const [postsData, setPostsData] = useState<PostModel[]>(posts); //
-  // const { data: postsData, setData: setPostsData } = useApi('/posts', []);
   const [count, setCount] = useState(0); // asynchronous  (batch update)
   const [time, setTime] = useState(0);
+  const [searchText, setSearchText] = useState('');
 
   const totalTitleLength = useRef<number>(0); // ref
-  const dispatch = useDispatch<AppDispatch>();
-  const { auth, posts, users } = useSelector((state: any) => state);
-  const postIds = posts.ids ?? [];
-  const postsData = posts.data || {};
-  const userData = users.data;
 
-  useEffect(() => {
-    dispatch(fetchListPosts());
-    dispatch(fetchListUsers());
-  }, [dispatch]);
+  const { isLoggedIn, postIds, postsData, userData, isLoading } =
+    useFetchPosts();
 
   const addPost = useCallback(() => {
     // setPostsData((prevPosts: any) => {
@@ -62,17 +55,33 @@ function ListPosts() {
   const handleIncrease = useCallback(() => {
     // re-render 1 time: batchupdate
     setCount(count + 1); // count 1: 2
-    // setCount(count + 1);
     setCount((prevCount) => prevCount + 1); // count 3
     setTime(time + Date.now());
   }, [count, time, setCount, setTime]);
 
-  console.log('re-render LIst post count ', count);
-  if (!auth.isLoggedIn) {
+  const debounceSearch = useMemo(() => {
+    return debounce(setSearchText, 300);
+  }, []);
+
+  const searchResults = useMemo(() => {
+    if (!searchText) return postIds;
+    return postIds.filter((id: PostModel['id']) => {
+      const title = postsData[id].title;
+      return title.includes(searchText);
+    });
+  }, [postsData, postIds, searchText]);
+
+  useEffect(() => {
+    return () => {
+      debounceSearch.cancel();
+    };
+  }, [debounceSearch]);
+
+  if (!isLoggedIn) {
     return <Navigate to='/login' replace={true} />;
   }
 
-  if (posts.loading === 'loading') {
+  if (postIds.length === 0 && isLoading) {
     return <p> loading ...</p>;
   }
 
@@ -80,24 +89,22 @@ function ListPosts() {
     <>
       <p>Count: {count}</p>
       <button onClick={handleIncrease}>Increase</button>
-      {/* <p style={{ color: 'green' }}>{total}</p> */}
       <button onClick={addPost}>Add post</button>
-      {postIds.map((id: PostModel['id']) => {
-        const post = postsData[id];
-        const postWithUser = post
-          ? { ...post, name: userData[post.userId].name }
-          : null;
-        return postWithUser ? (
-          <Post
-            key={postWithUser.id} // 1, 2, 3 1,
-            post={postWithUser}
-            // title={post.title}
-            // body={post.body}
-            // id={post.id}
-            // count={postsData.length}
-          />
-        ) : null;
-      })}
+      <Input label='Search' onChange={debounceSearch} />
+      <Suspense fallback={<p>Loading list ...</p>}>
+        {searchResults.map((id: PostModel['id']) => {
+          const post = postsData[id];
+          const postWithUser = post
+            ? { ...post, name: userData[post.userId].name }
+            : null;
+          return postWithUser ? (
+            <Post
+              key={postWithUser.id} // 1, 2, 3 1,
+              post={postWithUser}
+            />
+          ) : null;
+        })}
+      </Suspense>
     </>
   );
 }
@@ -116,4 +123,10 @@ export default ListPosts;
 // Challenge 12:
 /**
  * Configure store with redux/toolkit
+ */
+
+// Challenge 16:
+/**
+ * 1. debounce
+ * 2. custom hook for search function
  */

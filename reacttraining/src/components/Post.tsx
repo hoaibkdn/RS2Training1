@@ -1,54 +1,23 @@
 /** @format */
-import { memo, useContext, useState, useCallback, ChangeEvent } from 'react';
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { ListPostContext } from '../context/ListPostContext';
-import { FormEvent } from 'react';
 import { useDispatch } from 'react-redux';
-import { EDIT_POST } from './../store/actions';
+import useEditingPost, { PostModel } from '../hooks/useEditingPost';
 
-type InputField = 'body' | 'author';
-
-interface PostModel {
-  title: string;
-  body: string;
-  id: number;
-  userId: number;
-  name?: string;
-}
 type Props = {
-  // count?: number;
   post: PostModel;
 };
 
 const Post = ({ post }: Props) => {
-  const [editingField, setEdingField] = useState<InputField | null>(null);
-  const [changingInput, setChangingInput] = useState({
-    author: post.name,
-    body: post.body,
-  });
-  // const state = useSelector((state: any) => state);
-  // console.log('posts state ', state);
-  console.log('alo alo ', post.id);
   const dispatch = useDispatch();
-  const handleChangeInput = useCallback(
-    (event: ChangeEvent<HTMLInputElement>, field: InputField) => {
-      setChangingInput((prevState) => ({
-        ...prevState,
-        [field]: event.target.value,
-      }));
-      // submit post
-    },
-    []
-  );
-  const hanleSave = useCallback(() => {
-    dispatch({
-      type: EDIT_POST,
-      changingInput,
-      postId: post.id,
-      userId: post.userId,
-    });
-    setEdingField(null);
-  }, [dispatch, changingInput, post.id, setEdingField, post.userId]);
+  const {
+    editingField,
+    changingInput,
+    setEdingField,
+    handleChangeInput,
+    handleSave,
+  } = useEditingPost(post, dispatch);
+
   return (
     <div>
       <Link to={'post/' + post.id}>
@@ -62,13 +31,12 @@ const Post = ({ post }: Props) => {
               value={changingInput[editingField]}
               onChange={(e) => handleChangeInput(e, 'body')}
             />
-            <button onClick={() => hanleSave()}>Save</button>
+            <button onClick={() => handleSave()}>Save</button>
           </>
         ) : (
           <p
             onDoubleClick={() => {
               setEdingField('body');
-              // handleEdit(post, 'body');
             }}>
             {post.body}
           </p>
@@ -81,7 +49,7 @@ const Post = ({ post }: Props) => {
             value={changingInput[editingField]}
             onChange={(e) => handleChangeInput(e, 'author')}
           />
-          <button onClick={() => hanleSave()}>Save</button>
+          <button onClick={() => handleSave()}>Save</button>
         </>
       ) : (
         post.name && (

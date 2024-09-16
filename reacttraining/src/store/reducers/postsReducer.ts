@@ -1,12 +1,13 @@
 /** @format */
 
-import { createAsyncThunk, createSlice, CaseReducer, PayloadAction, PayloadActionCreator } from '@reduxjs/toolkit';
+import {
+  createAsyncThunk,
+  createSlice,
+} from '@reduxjs/toolkit';
 import { PostsState, PostModel, PostsDataObject } from './../../types/post';
 import { Action } from 'redux';
-import { UserModel } from './../../types/user';
 import { fetchData } from '../../utils/fetchData';
-import { EDIT_POST } from './../actions';
-// import { TypedActionCreator } from 'react-redux'
+import { EDIT_POST, DELETE_POST } from './../actions';
 
 export const fetchListPosts = createAsyncThunk(
   'posts/fetchListPosts',
@@ -41,47 +42,46 @@ const initialState: PostsState = {
 const postsSlice = createSlice({
   name: 'posts',
   initialState,
-  reducers: {
-
-  },
+  reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchListPosts.pending, (state, action) => {
-      state.loading = 'loading';
-    }).addCase(fetchListPosts.fulfilled, (state, action) => {
-      const posts = action.payload?.posts || [];
-      if (!posts.length) return;
-      const postObj: PostsDataObject = {};
-      const ids = posts.reduce(
-        (allIds: Array<PostModel['id']>, post: PostModel) => {
-          if (!state.data[post.id]) {
-            allIds.push(post.id);
-          }
-          postObj[post.id] = post;
-          return allIds;
-        },
-        []
-      );
-      state.data = { ...state.data, ...postObj };
-      state.ids = [...state.ids, ...ids];
-      state.error = action.payload?.error as string;
-      state.loading = 'succeed';
-    });
     builder
+      .addCase(fetchListPosts.pending, (state, action) => {
+        state.loading = 'loading';
+      })
+      .addCase(fetchListPosts.fulfilled, (state, action) => {
+        const posts = action.payload?.posts || [];
+        if (!posts.length) return;
+        const postObj: PostsDataObject = {};
+        const ids = posts.reduce(
+          (allIds: Array<PostModel['id']>, post: PostModel) => {
+            if (!state.data[post.id]) {
+              allIds.push(post.id);
+            }
+            postObj[post.id] = post;
+            return allIds;
+          },
+          []
+        );
+        state.data = { ...state.data, ...postObj };
+        state.ids = [...state.ids, ...ids];
+        state.error = action.payload?.error as string;
+        state.loading = 'succeed';
+      })
       .addCase(fetchListPosts.rejected, (state, action) => {
         state.loading = 'failed';
       })
-      .addCase<string, ActionType>(
-        EDIT_POST,
-        (
-          state,
-          action
-        ) => {
-          state.data[action.postId] = {
-            ...state.data[action.postId],
-            body: action.changingInput.body,
-          };
-        }
-      );
+      .addCase<string, ActionType>(EDIT_POST, (state, action) => {
+        state.data[action.postId] = {
+          ...state.data[action.postId],
+          body: action.changingInput.body,
+        };
+      })
+      .addCase<string, Action<string> & { postId: number }>(
+      DELETE_POST,
+      (state, action) => {
+        state.ids = state.ids.filter((id) => id !== action.postId);
+      }
+    );
   },
 });
 
