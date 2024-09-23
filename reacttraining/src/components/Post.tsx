@@ -27,6 +27,7 @@ const Post = ({ post }: Props) => {
         {editingField === 'body' ? (
           <>
             <input
+              data-testid='bodyInput'
               type='text'
               value={changingInput[editingField]}
               onChange={(e) => handleChangeInput(e, 'body')}
@@ -46,6 +47,7 @@ const Post = ({ post }: Props) => {
         <>
           <input
             type='text'
+            data-testid='authorInput'
             value={changingInput[editingField]}
             onChange={(e) => handleChangeInput(e, 'author')}
           />
@@ -54,6 +56,7 @@ const Post = ({ post }: Props) => {
       ) : (
         post.name && (
           <i
+            data-testid='author'
             onDoubleClick={() => {
               setEdingField('author');
             }}>

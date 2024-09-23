@@ -46,12 +46,14 @@ const postsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchListPosts.pending, (state, action) => {
+        console.log('1', state.data)
         state.loading = 'loading';
       })
       .addCase(fetchListPosts.fulfilled, (state, action) => {
         const posts = action.payload?.posts || [];
         if (!posts.length) return;
         const postObj: PostsDataObject = {};
+        console.log('2', state.data)
         const ids = posts.reduce(
           (allIds: Array<PostModel['id']>, post: PostModel) => {
             if (!state.data[post.id]) {
