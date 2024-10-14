@@ -8,12 +8,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { LOGIN } from './../store/actions';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { boxStyle } from './styles';
+import { login as handleLogin } from './../store/reducers/authReducer';
+import { AppDispatch } from '../store';
 
 const Login = () => {
   const [username, setUsername] = useState(''); // controlled component
   const [password, setPassword] = useState(''); // asynchronous  (batch update)
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const auth = useSelector((state: any) => state.auth);
   console.log('auth ', auth);
@@ -49,11 +51,12 @@ const Login = () => {
 
       if (!errorMsgs.username && !errorMsgs.password) {
         // dispatch Action
-        dispatch({
-          type: LOGIN,
-          username,
-          password,
-        });
+        // dispatch({
+        //   type: LOGIN,
+        //   username,
+        //   password,
+        // });
+        dispatch(handleLogin({ username, password }));
       }
     }
   }, []); // [] didmount

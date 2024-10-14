@@ -91,6 +91,12 @@ const key = obj['1'];
  * }
  */
 
+/**
+ * [1, 5, 0, -5, 4] // -> -5
+ * [-4] -> -4
+ * [] -> undefined
+ *    -> undefined
+ */
 function findSmallestNumber(arr) {
   if (!arr || arr.length === 0) return;
 
